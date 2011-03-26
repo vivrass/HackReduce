@@ -31,6 +31,7 @@ public class TaggerMapper extends WikipediaMapper<Text, LongWritable> {
 	// Just to save on object instantiation
 	public static final LongWritable ONE_COUNT = new LongWritable(1);
 
+	public static final Pattern TO_KEEP = Pattern.compile("^[a-z]+$");
 	@Override
 	protected void map(WikipediaRecord record, Context context) throws IOException, InterruptedException {
 		String text = record.getRawText();
@@ -41,10 +42,11 @@ public class TaggerMapper extends WikipediaMapper<Text, LongWritable> {
 		List<String> words = tokenizer.extractWords(text);
 		
 		for(String word : words) {
-			word = eng.singularlize(word.toLowerCase());
-			
-			for (String category : categories) {
-				context.write(new Text(category + ":" + word), new LongWritable(1));
+			word = eng.singularlize(word).toLowerCase();
+			if (TO_KEEP.matcher(word).matches()) {
+				for (String category : categories) {
+					context.write(new Text(category + ":" + word), new LongWritable(1));
+				}
 			}
 		}
 
