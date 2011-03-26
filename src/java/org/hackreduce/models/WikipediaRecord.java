@@ -1,6 +1,8 @@
 package org.hackreduce.models;
 
+import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,6 +18,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
+import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
+import org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder;
+import org.eclipse.mylyn.wikitext.mediawiki.core.MediaWikiLanguage;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.parser.ParserDelegator;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Vector;
+import java.util.regex.*;
+
 
 public class WikipediaRecord {
 
@@ -133,5 +147,42 @@ public class WikipediaRecord {
 	public void setText(String text) {
 		this.text = text;
 	}
+
+    public String getRawText() {
+        StringWriter writer = new StringWriter();
+
+        HtmlDocumentBuilder builder = new HtmlDocumentBuilder(writer);
+        builder.setEmitAsDocument(false);
+
+        MarkupParser parser = new MarkupParser(new MediaWikiLanguage());
+        parser.setBuilder(builder);
+        parser.parse(getText());
+
+        final String html = writer.toString();
+        final StringBuilder cleaned = new StringBuilder();
+
+        HTMLEditorKit.ParserCallback callback = new HTMLEditorKit.ParserCallback() {
+            public void handleText(char[] data, int pos) {
+                cleaned.append(new String(data)).append(' ');
+            }
+        };
+        try {
+            new ParserDelegator().parse(new StringReader(html), callback, false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return cleaned.toString();
+    }
+
+    public ArrayList<String> getCategories() {
+    	ArrayList<String> categories = new ArrayList<String>();
+		Pattern p = Pattern.compile("\\[\\[Category:([0-9a-zA-z ]+).*\\]\\]");
+		Matcher m = p.matcher(getText());
+		while(m.find()) {
+			categories.add(m.group(1));
+		}
+		return categories;
+    }
 
 }

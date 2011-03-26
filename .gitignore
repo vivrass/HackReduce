@@ -10,3 +10,5 @@
 /junit
 /nbproject
 /notes.txt
+*.swp
+hackreduce.pem

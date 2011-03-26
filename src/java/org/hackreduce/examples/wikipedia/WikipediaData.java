@@ -1,19 +1,21 @@
 package org.hackreduce.examples.wikipedia;
 
+import java.util.ArrayList;
+
 public class WikipediaData {
 	String text;
-	String[] categories;
+	ArrayList<String> categories;
 	
-	public WikipediaData(String text, String[] categories) {
+	public WikipediaData(String text, ArrayList<String> categories) {
 		this.text = text;
 		this.categories = categories;
 	}
 	
-	public String[] getCategories() {
+	public ArrayList<String> getCategories() {
 		return categories;
 	}
 
-	public void setCategories(String[] categories) {
+	public void setCategories(ArrayList<String> categories) {
 		this.categories = categories;
 	}
 
