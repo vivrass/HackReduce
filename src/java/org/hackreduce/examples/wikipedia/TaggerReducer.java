@@ -12,7 +12,6 @@ public class TaggerReducer extends Reducer<Text, LongWritable, Text, LongWritabl
 	@Override
 	protected void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
 		context.getCounter(TaggerCount.UNIQUE_KEYS).increment(1);
-		context.getCounter(TaggerCount.TAGGER_KEYS).increment(1);
 
 		long count = 0;
 		for (LongWritable value : values) {

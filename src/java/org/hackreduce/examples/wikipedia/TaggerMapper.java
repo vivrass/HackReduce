@@ -2,9 +2,12 @@ package org.hackreduce.examples.wikipedia;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.hackreduce.examples.wikipedia.Tagger.TaggerCount;
 import org.hackreduce.mappers.WikipediaMapper;
 import org.hackreduce.models.WikipediaRecord;
 
@@ -23,15 +26,18 @@ public class TaggerMapper extends WikipediaMapper<Text, LongWritable> {
 	public static final LongWritable ONE_COUNT = new LongWritable(1);
 
 	@Override
-	protected void map(WikipediaRecord record, Context context) throws IOException,
-			InterruptedException {
-
+	protected void map(WikipediaRecord record, Context context) throws IOException, InterruptedException {
 		String text = record.getText();
 		ArrayList<String> categories = record.getCategories();
-		for (String category : categories) {
-			for (String word : text.split(" ")) {
-				context.write(new Text(category + ":" + word), new LongWritable(1));
+
+		Pattern p = Pattern.compile("[\\s\\p{P}]?([a-zA-Z]+)");
+		Matcher m = p.matcher(text);
+		while(m.find()) {
+			for (String category : categories) {
+				context.write(new Text(category + ":" + m.group(1)), new LongWritable(1));
 			}
 		}
+
+		context.getCounter(TaggerCount.ARTICLES_PARSED).increment(1);
 	}
 }

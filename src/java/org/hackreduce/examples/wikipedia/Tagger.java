@@ -1,7 +1,5 @@
 package org.hackreduce.examples.wikipedia;
 
-import java.io.IOException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -28,7 +26,7 @@ public class Tagger extends Configured implements Tool {
 
 	public enum TaggerCount {
 		UNIQUE_KEYS,
-		TAGGER_KEYS
+		ARTICLES_PARSED
 	}
 
 	public Class<? extends ModelMapper<?, ?, ?, ?, ?>> getMapper() {
