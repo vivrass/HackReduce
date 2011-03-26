@@ -27,9 +27,6 @@
             <fileset dir="${lib.dir}">
               <include name="*.jar" />
             </fileset>
-            <fileset dir="lib/3rd">
-              <include name="*.jar" />
-            </fileset>
           </classpath>
         </javac>
     	<property name="msg" value="hackreduce-${version}"/>
@@ -41,9 +38,8 @@
     <target name="jar" depends="compile" description="--> create the jar file">
       <mkdir dir="${target.dir}" />
     	<jar destfile="${target.dir}/hackreduce-${version}.jar">
-      	<fileset dir="${build.dir}"/>
-        <fileset dir="lib"/>
-        <fileset dir="lib/3rd/"/>
+            <fileset dir="${build.dir}"/>
+            <fileset dir="."/>
     	</jar>
     </target>
 
