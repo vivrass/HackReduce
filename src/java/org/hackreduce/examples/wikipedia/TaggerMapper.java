@@ -34,23 +34,27 @@ public class TaggerMapper extends WikipediaMapper<Text, LongWritable> {
 	public static final Pattern TO_KEEP = Pattern.compile("^[a-z]+$");
 	@Override
 	protected void map(WikipediaRecord record, Context context) throws IOException, InterruptedException {
-		String text = record.getRawText();
-		ArrayList<String> categories = record.getCategories();
+		try {
+			String text = record.getRawText();
+			ArrayList<String> categories = record.getCategories();
 
-		EnglishInflector eng = new EnglishInflector();
-		WordTokenizer tokenizer = new DefaultWordTokenizer();
-		List<String> words = tokenizer.extractWords(text);
-		
-		for(String word : words) {
-			word = eng.singularlize(word).toLowerCase();
-			if (TO_KEEP.matcher(word).matches()) {
-				for (String category : categories) {
-					context.write(new Text(category + ":" + word), new LongWritable(1));
+			EnglishInflector eng = new EnglishInflector();
+			WordTokenizer tokenizer = new DefaultWordTokenizer();
+			List<String> words = tokenizer.extractWords(text);
+
+			for(String word : words) {
+				word = eng.singularlize(word).toLowerCase();
+				if (TO_KEEP.matcher(word).matches()) {
+					for (String category : categories) {
+						context.write(new Text(category + ":" + word), new LongWritable(1));
+					}
 				}
 			}
-		}
 
-		context.getCounter(TaggerCount.ARTICLES_PARSED).increment(1);
+			context.getCounter(TaggerCount.ARTICLES_PARSED).increment(1);
+		} catch (Exception e) {
+			
+		}
 	}
 
 }
