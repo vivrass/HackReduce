@@ -11,9 +11,13 @@ public class TaggerCombiner extends Reducer<Text, DoubleWritable, Text, DoubleWr
 
 	@Override
 	protected void reduce(Text key, Iterable<DoubleWritable> values, Context context) throws IOException, InterruptedException {
-		context.getCounter(TaggerCount.UNIQUE_KEYS).increment(1);
+		try {
+			context.getCounter(TaggerCount.UNIQUE_KEYS).increment(1);
 
-		context.write(key, new DoubleWritable(calculateCount(values)));
+			context.write(key, new DoubleWritable(calculateCount(values)));
+		} catch (Exception e) {
+			
+		}
 	}
 	
 	double calculateCount(Iterable<DoubleWritable> values) {
