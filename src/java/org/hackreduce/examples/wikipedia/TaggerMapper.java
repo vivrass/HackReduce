@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.ToolRunner;
 import org.hackreduce.mappers.ModelMapper;
@@ -49,7 +50,6 @@ public class TaggerMapper extends org.hackreduce.examples.wikipedia.Tagger {
 			
 			WikipediaData wikiData = new WikipediaData(text, categories);
 			
-			
 			//System.out.println(text);
 			//context.getCounter(Count.TOTAL_RECORDS).increment(1);
 			//context.write(TOTAL_COUNT, ONE_COUNT);
@@ -84,39 +84,15 @@ public class TaggerMapper extends org.hackreduce.examples.wikipedia.Tagger {
 		}
 
 		protected String[] extractCategories(String wiki) {
-//			System.out.println("TEST MARTIN 1\n\n");
 			ArrayList<String> categories = new ArrayList<String>();
-//			System.out.println("TEST MARTIN 2\n\n");
 			Pattern p = Pattern.compile("\\[\\[Category:([0-9a-zA-z ]+).*\\]\\]");
-//			Pattern p = Pattern.compile("(.*Category.*)");
 			Matcher m = p.matcher(wiki);
-//			System.out.println("TEST MARTIN 3\n\n");
 			while(m.find()) {
-//				System.out.println("TEST MARTIN 3.5\n\n");
 				System.out.println(m.group(1));
 				categories.add(m.group(1));
 			}
-//			System.out.println("TEST MARTIN 4\n\n");
 			return categories.toArray(new String[0]);
 		}
-	}
-
-	@Override
-	public void configureJob(Job job) {
-		// The Wikipedia format come in XML, so we configure
-		// the job to use this format.
-		job.setInputFormatClass(XMLInputFormat.class);
-		XMLRecordReader.setRecordTags(job, "<page>", "</page>");
-	}
-
-	@Override
-	public Class<? extends ModelMapper<?, ?, ?, ?, ?>> getMapper() {
-		return WikipediaParser.class;
-	}
-
-	public static void main(String[] args) throws Exception {
-		int result = ToolRunner.run(new Configuration(), new TaggerMapper(), args);
-		System.exit(result);
 	}
 
 }

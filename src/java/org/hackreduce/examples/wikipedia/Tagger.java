@@ -13,7 +13,11 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
+import org.hackreduce.examples.wikipedia.TaggerMapper.WikipediaParser;
 import org.hackreduce.mappers.ModelMapper;
+import org.hackreduce.mappers.XMLInputFormat;
+import org.hackreduce.mappers.XMLRecordReader;
 
 
 /**
@@ -22,29 +26,24 @@ import org.hackreduce.mappers.ModelMapper;
  */
 public abstract class Tagger extends Configured implements Tool {
 
-	public enum RecordCounterCount {
-		UNIQUE_KEYS
+	public enum TaggerCount {
+		UNIQUE_KEYS,
+		TAGGER_KEYS
 	}
 
-	public static class RecordCounterReducer extends Reducer<Text, LongWritable, Text, LongWritable> {
-
-		@Override
-		protected void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
-			context.getCounter(RecordCounterCount.UNIQUE_KEYS).increment(1);
-
-			long count = 0;
-			for (LongWritable value : values) {
-				count += value.get();
-			}
-
-			context.write(key, new LongWritable(count));
-		}
-
+	public Class<? extends ModelMapper<?, ?, ?, ?, ?>> getMapper() {
+		return WikipediaParser.class;
+	}
+	public Class<? extends Reducer<?, ?, ?, ?>> getReducer() {
+		return TaggerReducer.class;
 	}
 
-	public abstract Class<? extends ModelMapper<?,?,?,?,?>> getMapper();
-
-	public abstract void configureJob(Job job);
+	public void configureJob(Job job) {
+		// The Wikipedia format come in XML, so we configure
+		// the job to use this format.
+		job.setInputFormatClass(XMLInputFormat.class);
+		XMLRecordReader.setRecordTags(job, "<page>", "</page>");
+	};
 
 	@Override
 	public int run(String[] args) throws Exception {
@@ -62,7 +61,7 @@ public abstract class Tagger extends Configured implements Tool {
 
         // Tell the job which Mapper and Reducer to use (classes defined above)
         job.setMapperClass(getMapper());
-		job.setReducerClass(RecordCounterReducer.class);
+		job.setReducerClass(getReducer());
 
         configureJob(job);
 
@@ -83,5 +82,10 @@ public abstract class Tagger extends Configured implements Tool {
 	    FileOutputFormat.setOutputPath(job, output);
 
 		return job.waitForCompletion(true) ? 0 : 1;
+	}
+	
+	public static void main(String[] args) throws Exception {
+		int result = ToolRunner.run(new Configuration(), new TaggerMapper(), args);
+		System.exit(result);
 	}
 }
