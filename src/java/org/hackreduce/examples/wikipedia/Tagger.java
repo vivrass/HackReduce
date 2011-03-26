@@ -4,7 +4,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -26,7 +26,8 @@ public class Tagger extends Configured implements Tool {
 
 	public enum TaggerCount {
 		UNIQUE_KEYS,
-		ARTICLES_PARSED
+		ARTICLES_PARSED,
+		ARTICLES_IGNORED
 	}
 
 	public Class<? extends ModelMapper<?, ?, ?, ?, ?>> getMapper() {
@@ -69,11 +70,11 @@ public class Tagger extends Configured implements Tool {
 
 		// This is what the Mapper will be outputting to the Reducer
 		job.setMapOutputKeyClass(Text.class);
-		job.setMapOutputValueClass(LongWritable.class);
+		job.setMapOutputValueClass(DoubleWritable.class);
 
 		// This is what the Reducer will be outputting
 		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(LongWritable.class);
+		job.setOutputValueClass(DoubleWritable.class);
 
 		// Setting the input folder of the job 
 		FileInputFormat.addInputPath(job, new Path(args[0]));

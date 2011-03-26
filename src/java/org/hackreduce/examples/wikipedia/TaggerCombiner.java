@@ -2,29 +2,30 @@ package org.hackreduce.examples.wikipedia;
 
 import java.io.IOException;
 
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.hackreduce.examples.wikipedia.Tagger.TaggerCount;
 
-public class TaggerCombiner extends Reducer<Text, LongWritable, Text, LongWritable> {
+public class TaggerCombiner extends Reducer<Text, DoubleWritable, Text, DoubleWritable> {
 
 	@Override
-	protected void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
+	protected void reduce(Text key, Iterable<DoubleWritable> values, Context context) throws IOException, InterruptedException {
 		context.getCounter(TaggerCount.UNIQUE_KEYS).increment(1);
 
-		
-
-		context.write(key, new LongWritable(calculateCount(values)));
+		context.write(key, new DoubleWritable(calculateCount(values)));
 	}
 	
-	long calculateCount(Iterable<LongWritable> values) {
+	double calculateCount(Iterable<DoubleWritable> values) {
 		long count = 0;
-		for (LongWritable value : values) {
-			count += value.get();
-		}
+		double finalValue = 0;
 		
-		return count;
+		for (DoubleWritable value : values) {
+//			System.out.println(value);
+			finalValue += value.get();
+			count += 1;
+		}
+		return finalValue/count;
 	}
 
 }
