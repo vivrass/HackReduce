@@ -3,16 +3,9 @@ package org.hackreduce.examples.wikipedia;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.util.ToolRunner;
-import org.hackreduce.mappers.ModelMapper;
 import org.hackreduce.mappers.WikipediaMapper;
-import org.hackreduce.mappers.XMLInputFormat;
-import org.hackreduce.mappers.XMLRecordReader;
 import org.hackreduce.models.WikipediaRecord;
 
 
@@ -37,8 +30,11 @@ public class TaggerMapper extends org.hackreduce.examples.wikipedia.Tagger {
 
 			String text = record.getText();
 			ArrayList<String> categories = record.getCategories();
-			
-			WikipediaData wikiData = new WikipediaData(text, categories);
+			for (String category : categories) {
+				for (String word : text.split(" ")) {
+					context.write(new Text(category + ":" + word), new LongWritable(1));
+				}
+			}
 		}
 	}
 }
