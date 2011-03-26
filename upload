@@ -1,0 +1,1 @@
+scp -i hackreduce.pem dist/hackreduce-0.1.jar hadoop@hackreduce-namenode.hopper.to:~/user/wikitag
