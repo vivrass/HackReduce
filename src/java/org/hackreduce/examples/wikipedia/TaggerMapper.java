@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.cxf.binding.http.strategy.EnglishInflector;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.hackreduce.examples.wikipedia.Tagger.TaggerCount;
 import org.hackreduce.mappers.WikipediaMapper;
 import org.hackreduce.models.WikipediaRecord;
+
 
 /**
  * This MapReduce job will map Wikipedia data to actual workable data for the tagger algorithm.
@@ -27,17 +29,23 @@ public class TaggerMapper extends WikipediaMapper<Text, LongWritable> {
 
 	@Override
 	protected void map(WikipediaRecord record, Context context) throws IOException, InterruptedException {
+		String word;
 		String text = record.getText();
 		ArrayList<String> categories = record.getCategories();
 
+		EnglishInflector eng = new EnglishInflector();
 		Pattern p = Pattern.compile("[\\s\\p{P}]?([a-zA-Z]+)");
 		Matcher m = p.matcher(text);
 		while(m.find()) {
 			for (String category : categories) {
-				context.write(new Text(category + ":" + m.group(1)), new LongWritable(1));
+				word = m.group(1);
+				word.toLowerCase();
+				word = eng.singularlize(word);
+				context.write(new Text(category + ":" + word), new LongWritable(1));
 			}
 		}
 
 		context.getCounter(TaggerCount.ARTICLES_PARSED).increment(1);
 	}
+
 }
