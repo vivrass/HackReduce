@@ -54,7 +54,8 @@ public class TaggerMapper extends WikipediaMapper<Text, DoubleWritable> {
 			WordTokenizer tokenizer = new DefaultWordTokenizer();
 			List<String> words = tokenizer.extractWords(text);
 			Hashtable<String, Long> uniqueValues = new Hashtable<String, Long>();
-
+			int count = 0;
+			
 			long currentCount = 0;
 			for(String word : words) {
 				word = eng.singularlize(word).toLowerCase();
@@ -66,12 +67,13 @@ public class TaggerMapper extends WikipediaMapper<Text, DoubleWritable> {
 					else
 						currentCount = 1;
 					uniqueValues.put(word, currentCount);
+					count += 1;
 				}
 			}
 
 			Enumeration<String> keys = uniqueValues.keys();
 			String key;
-			int count = words.size();
+			
 			while(keys.hasMoreElements()) {
 				key = keys.nextElement();
 				double value = ((double)uniqueValues.get(key))/count;
