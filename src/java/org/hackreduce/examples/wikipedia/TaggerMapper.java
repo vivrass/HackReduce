@@ -16,6 +16,8 @@ import org.hackreduce.examples.wikipedia.Tagger.TaggerCount;
 import org.hackreduce.mappers.WikipediaMapper;
 import org.hackreduce.models.WikipediaRecord;
 
+import edu.northwestern.at.utils.corpuslinguistics.stopwords.DefaultStopWords;
+import edu.northwestern.at.utils.corpuslinguistics.stopwords.StopWords;
 import edu.northwestern.at.utils.corpuslinguistics.tokenizer.DefaultWordTokenizer;
 import edu.northwestern.at.utils.corpuslinguistics.tokenizer.WordTokenizer;
 
@@ -47,6 +49,7 @@ public class TaggerMapper extends WikipediaMapper<Text, DoubleWritable> {
 				return;
 			}
 
+			StopWords stopWords = new DefaultStopWords();
 			EnglishInflector eng = new EnglishInflector();
 			WordTokenizer tokenizer = new DefaultWordTokenizer();
 			List<String> words = tokenizer.extractWords(text);
@@ -55,6 +58,8 @@ public class TaggerMapper extends WikipediaMapper<Text, DoubleWritable> {
 			long currentCount = 0;
 			for(String word : words) {
 				word = eng.singularlize(word).toLowerCase();
+				if (stopWords.isStopWord(word))
+					continue;
 				if (TO_KEEP.matcher(word).matches()) {
 					if( uniqueValues.containsKey(word) )
 						currentCount = (Long) uniqueValues.get(word) + 1;
