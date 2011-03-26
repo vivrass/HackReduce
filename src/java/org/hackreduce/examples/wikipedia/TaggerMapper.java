@@ -2,6 +2,7 @@ package org.hackreduce.examples.wikipedia;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,6 +12,9 @@ import org.apache.hadoop.io.Text;
 import org.hackreduce.examples.wikipedia.Tagger.TaggerCount;
 import org.hackreduce.mappers.WikipediaMapper;
 import org.hackreduce.models.WikipediaRecord;
+
+import edu.northwestern.at.utils.corpuslinguistics.tokenizer.DefaultWordTokenizer;
+import edu.northwestern.at.utils.corpuslinguistics.tokenizer.WordTokenizer;
 
 
 /**
@@ -29,18 +33,17 @@ public class TaggerMapper extends WikipediaMapper<Text, LongWritable> {
 
 	@Override
 	protected void map(WikipediaRecord record, Context context) throws IOException, InterruptedException {
-		String word;
-		String text = record.getText();
+		String text = record.getRawText();
 		ArrayList<String> categories = record.getCategories();
 
 		EnglishInflector eng = new EnglishInflector();
-		Pattern p = Pattern.compile("[\\s\\p{P}]?([a-zA-Z]+)");
-		Matcher m = p.matcher(text);
-		while(m.find()) {
+		WordTokenizer tokenizer = new DefaultWordTokenizer();
+		List<String> words = tokenizer.extractWords(text);
+		
+		for(String word : words) {
+			word = eng.singularlize(word.toLowerCase());
+			
 			for (String category : categories) {
-				word = m.group(1);
-				word.toLowerCase();
-				word = eng.singularlize(word);
 				context.write(new Text(category + ":" + word), new LongWritable(1));
 			}
 		}

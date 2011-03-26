@@ -42,6 +42,7 @@
       <mkdir dir="${target.dir}" />
     	<jar destfile="${target.dir}/hackreduce-${version}.jar">
       	<fileset dir="${build.dir}"/>
+        <fileset dir="lib"/>
         <fileset dir="lib/3rd/"/>
     	</jar>
     </target>
