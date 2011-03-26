@@ -14,7 +14,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import org.hackreduce.examples.wikipedia.TaggerMapper.WikipediaParser;
+import org.hackreduce.examples.wikipedia.TaggerMapper;
 import org.hackreduce.mappers.ModelMapper;
 import org.hackreduce.mappers.XMLInputFormat;
 import org.hackreduce.mappers.XMLRecordReader;
@@ -24,7 +24,7 @@ import org.hackreduce.mappers.XMLRecordReader;
  * This MapReduce job will count the total number of Bixi records in the data dump.
  *
  */
-public abstract class Tagger extends Configured implements Tool {
+public class Tagger extends Configured implements Tool {
 
 	public enum TaggerCount {
 		UNIQUE_KEYS,
@@ -32,7 +32,7 @@ public abstract class Tagger extends Configured implements Tool {
 	}
 
 	public Class<? extends ModelMapper<?, ?, ?, ?, ?>> getMapper() {
-		return WikipediaParser.class;
+		return TaggerMapper.class;
 	}
 	public Class<? extends Reducer<?, ?, ?, ?>> getReducer() {
 		return TaggerReducer.class;
@@ -85,7 +85,7 @@ public abstract class Tagger extends Configured implements Tool {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		int result = ToolRunner.run(new Configuration(), new TaggerMapper(), args);
+		int result = ToolRunner.run(new Configuration(), new Tagger(), args);
 		System.exit(result);
 	}
 }
