@@ -11,12 +11,16 @@ public class TaggerReducer extends TaggerCombiner {
 
 	@Override
 	protected void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
-		context.getCounter(TaggerCount.UNIQUE_KEYS).increment(1);
+		try {
+			context.getCounter(TaggerCount.UNIQUE_KEYS).increment(1);
 
-		long count = calculateCount(values);
-		
-		if (count > 5)
-			context.write(key, new LongWritable(count));
+			long count = calculateCount(values);
+
+			if (count > 5)
+				context.write(key, new LongWritable(count));
+		} catch(Exception e) {
+			
+		}
 	}
 
 }
