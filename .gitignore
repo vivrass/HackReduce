@@ -13,3 +13,4 @@
 *.swp
 hackreduce.pem
 output
+.DS_Store
