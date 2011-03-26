@@ -35,6 +35,9 @@ public class Tagger extends Configured implements Tool {
 	public Class<? extends Reducer<?, ?, ?, ?>> getReducer() {
 		return TaggerReducer.class;
 	}
+	public Class<? extends Reducer<?, ?, ?, ?>> getCombiner() {
+		return TaggerCombiner.class;
+	}
 
 	public void configureJob(Job job) {
 		// The Wikipedia format come in XML, so we configure
@@ -60,6 +63,7 @@ public class Tagger extends Configured implements Tool {
         // Tell the job which Mapper and Reducer to use (classes defined above)
         job.setMapperClass(getMapper());
 		job.setReducerClass(getReducer());
+		job.setCombinerClass(getCombiner());
 
         configureJob(job);
 
