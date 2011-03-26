@@ -65,6 +65,8 @@ public class Tagger extends Configured implements Tool {
         job.setMapperClass(getMapper());
 		job.setReducerClass(getReducer());
 		job.setCombinerClass(getCombiner());
+		
+		job.setNumReduceTasks(400);
 
         configureJob(job);
 
