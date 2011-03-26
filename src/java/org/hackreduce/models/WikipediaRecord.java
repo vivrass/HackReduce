@@ -156,8 +156,17 @@ public class WikipediaRecord {
         parser.parse(getText());
 
         final String html = writer.toString();
-        final StringBuilder cleaned = new StringBuilder();
+        
+//        final StringBuffer cleaned = new StringBuffer();
+//        Pattern p = Pattern.compile("<.*?>|\\p{P}");
+//		Matcher m = p.matcher(html);
+//		boolean result = m.find();
+//        while(result) {
+//            m.appendReplacement(cleaned, " ");
+//            result = m.find();
+//        }
 
+        final StringBuffer cleaned = new StringBuffer();
         HTMLEditorKit.ParserCallback callback = new HTMLEditorKit.ParserCallback() {
             public void handleText(char[] data, int pos) {
                 cleaned.append(new String(data)).append(' ');
@@ -168,7 +177,7 @@ public class WikipediaRecord {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        
         return cleaned.toString();
     }
 
